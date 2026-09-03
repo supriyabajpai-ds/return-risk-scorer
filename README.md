@@ -8,7 +8,7 @@ customers.
 > **Track 02 — AI Risk Manager.** Defense-only. Honest metrics including false-positive cost.
 > Measured precision & recall on a held-out (time-based) test set.
 
-🔗 **Live demo:** [_open_](https://return-risk-scorer-lrau.onrender.com/)
+🔗 **Live demo:** https://return-risk-scorer-lrau.onrender.com
 📹 **5-min video:** _add your video link here_
 
 ---
@@ -24,6 +24,46 @@ are returned** — so the data is imbalanced, and that changes everything:
 
 So accuracy is a useless headline here. This project is judged the honest way: **precision,
 recall, and PR-AUC**, plus the **rupee cost of mistakes**.
+
+---
+
+## Architecture
+
+```
+  ┌──────────────────────────────────────────────────────────┐
+  │                     LIVE SCORING                         │
+  │                                                          │
+  │   Browser  ──order (JSON)──►  Flask API                  │
+  │   (form, gauge,               (/predict /metrics /curve) │
+  │    cost curve)                        │                  │
+  │                             encode → align → scale       │
+  │                                       ▼                  │
+  │                              Trained model               │
+  │                          (Logistic Regression)           │
+  │                                       │                  │
+  │                                risk score (0–1)          │
+  │                                       ▼                  │
+  │                    threshold (from rupee cost curve)     │
+  │                          decides: flag / fine            │
+  │                                       ▼                  │
+  │              Merchant decides  (advises, never           │
+  │                                 auto-blocks)             │
+  └──────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────┐
+  │            OFFLINE TRAINING (builds the model)           │
+  │                                                          │
+  │   orders.csv → time-based split → compare 3 models       │
+  │   → pick winner by PR-AUC → build rupee cost curve       │
+  │   → save model.pkl + scaler + columns + threshold        │
+  └──────────────────────────────────────────────────────────┘
+```
+
+**How it flows:** the browser sends an order to a Flask API, which preprocesses it exactly
+like training (encode → align columns → scale), runs the trained model to get a risk score,
+and applies the cost-curve threshold to decide whether to flag it. The merchant sees the
+signal and decides — the tool never auto-blocks. Everything the user sees (gauge, live
+metrics, cost curve) is real model output.
 
 ---
 
@@ -95,7 +135,7 @@ place if it beats the baseline — here it didn't.
 - **ML:** Python, scikit-learn (Logistic Regression + StandardScaler), XGBoost, pandas
 - **Backend:** Flask (REST API: `/predict`, `/metrics`, `/curve`)
 - **Frontend:** HTML / CSS / JavaScript, Chart.js (live risk gauge + cost curve)
-- **Deploy:** Render
+- **Deploy:** Render (kept always-on with an uptime ping)
 
 ---
 
