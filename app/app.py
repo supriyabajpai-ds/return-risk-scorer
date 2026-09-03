@@ -86,6 +86,7 @@ def curve():
     # find the cheapest threshold on the curve
     best = min(points, key=lambda p: p["cost"])
     return jsonify({"points": points, "best": best})
-
+import os
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
