@@ -8,7 +8,7 @@ customers.
 > **Track 02 — AI Risk Manager.** Defense-only. Honest metrics including false-positive cost.
 > Measured precision & recall on a held-out (time-based) test set.
 
-🔗 **Live demo:** _add your Render URL here_
+🔗 **Live demo:** [_open_](https://return-risk-scorer-lrau.onrender.com/)
 📹 **5-min video:** _add your video link here_
 
 ---
