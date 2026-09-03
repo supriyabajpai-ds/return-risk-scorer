@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Return Risk Scorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">◆</div>
+      <div>
+        <div class="brand-title">Return Risk Scorer <span class="badge">BETA</span></div>
+        <div class="brand-sub">Rupee-aware risk scoring for merchants</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="live-dot"></span> Live model
+    </div>
+  </header>
+
+  <!-- ===== DASHBOARD GRID ===== -->
+  <main class="grid">
+
+    <!-- ---- LEFT: transaction form ---- -->
+    <section class="panel">
+      <h2 class="panel-title">Enter order details</h2>
+      <p class="panel-sub">All fields feed the live model.</p>
+
+      <label class="field">Order value (₹)
+        <input type="number" id="order_value" value="2000">
+      </label>
+
+      <label class="field">Category
+        <select id="category">
+          <option>Clothing</option>
+          <option>Electronics</option>
+          <option>Home</option>
+          <option>Beauty</option>
+          <option>Books</option>
+        </select>
+      </label>
+
+      <label class="field">Payment method
+        <select id="payment_method">
+          <option>COD</option>
+          <option>Prepaid</option>
+        </select>
+      </label>
+
+      <label class="field">Customer age (days)
+        <input type="number" id="customer_age_days" value="300">
+      </label>
+
+      <label class="field">Past orders
+        <input type="number" id="past_orders" value="5">
+      </label>
+
+      <label class="field">Past return rate (0–1)
+        <input type="number" step="0.01" id="past_return_rate" value="0.2">
+      </label>
+
+      <label class="field">Address mismatch (0 or 1)
+        <input type="number" id="address_mismatch" value="0">
+      </label>
+
+      <label class="field">Delivery days
+        <input type="number" id="delivery_days" value="5">
+      </label>
+
+      <label class="field">Orders in last 24h
+        <input type="number" id="orders_last_24h" value="1">
+      </label>
+
+      <label class="field">Discount %
+        <input type="number" id="discount_pct" value="10">
+      </label>
+
+      <button class="btn-primary" onclick="scoreOrder()">✦ Score this order</button>
+    </section>
+
+    <!-- ---- CENTER: live risk gauge ---- -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Return risk score</h2>
+          <p class="panel-sub">Live output from the trained model</p>
+        </div>
+        <span class="live-pill"><span class="live-dot"></span> Live analysis</span>
+      </div>
+
+      <!-- SVG gauge -->
+      <div class="gauge-wrap">
+        <svg viewBox="0 0 240 140" class="gauge">
+          <!-- track -->
+          <path d="M20 130 A100 100 0 0 1 220 130" fill="none" stroke="#1e293b" stroke-width="18" stroke-linecap="round"/>
+          <!-- colored progress -->
+          <path id="gaugeArc" d="M20 130 A100 100 0 0 1 220 130" fill="none" stroke="url(#gaugeGrad)" stroke-width="18" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#22d3ee"/>
+              <stop offset="55%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#f87171"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-num" id="gauge_num">–</div>
+          <div class="gauge-verdict" id="gauge_verdict">Score an order</div>
+        </div>
+        <div class="gauge-ends"><span>0</span><span>100</span></div>
+      </div>
+
+      <div id="result" class="verdict-box">Enter an order and press “Score this order”.</div>
+    </section>
+
+    <!-- ---- RIGHT: cost model + tuner (all real) ---- -->
+    <section class="panel">
+      <h2 class="panel-title">Rupee cost model</h2>
+      <p class="panel-sub">The threshold that loses the least money.</p>
+
+      <div class="metrics-row">
+        <div class="metric"><div class="metric_num" id="m_precision">–</div><div class="metric_lbl">Precision</div></div>
+        <div class="metric"><div class="metric_num" id="m_recall">–</div><div class="metric_lbl">Recall</div></div>
+        <div class="metric"><div class="metric_num" id="m_cost">–</div><div class="metric_lbl">Money lost</div></div>
+      </div>
+
+      <div class="tuner">
+        <div class="tuner-label">Threshold: <b id="threshold_label">0.57</b></div>
+        <input type="range" id="threshold_slider" min="0" max="1" step="0.01" value="0.57">
+      </div>
+
+      <div class="chart-box">
+        <canvas id="costChart"></canvas>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">🔒 Trained &amp; evaluated on time-split data · synthetic dataset · defense-only</footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
