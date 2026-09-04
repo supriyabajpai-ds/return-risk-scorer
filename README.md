@@ -9,7 +9,7 @@ customers.
 > Measured precision & recall on a held-out (time-based) test set.
 
 🔗 **Live demo:** https://return-risk-scorer-lrau.onrender.com
-📹 **5-min video:** _add your video link here_
+📹 **5-min video:** https://drive.google.com/drive/folders/1pMA6vndt3DTFepkWjKBr2XkH-UJVBFsj?usp=sharing
 
 ---
 
